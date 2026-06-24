@@ -1,0 +1,680 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{display:flex;min-height:600px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:200px;min-width:200px;background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-logo{padding:16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sidebar-logo .brand{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-logo .sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.role-switcher{padding:10px}
+.role-switcher select{width:100%;font-size:12px;padding:6px 8px;border-radius:var(--border-radius-md)}
+.nav-section{padding:8px 10px 4px;font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-radius:var(--border-radius-md);margin:1px 6px;transition:background .15s}
+.nav-item:hover{background:var(--color-background-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500}
+.nav-item i{font-size:16px;opacity:.7}
+.nav-item.active i{opacity:1}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.topbar{padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:15px;font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500}
+.badge-info{background:var(--color-background-info);color:var(--color-text-info)}
+.badge-warn{background:var(--color-background-warning);color:var(--color-text-warning)}
+.badge-danger{background:var(--color-background-danger);color:var(--color-text-danger)}
+.badge-success{background:var(--color-background-success);color:var(--color-text-success)}
+.content{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.metric-danger .metric-value{color:var(--color-text-danger)}
+.metric-success .metric-value{color:var(--color-text-success)}
+.metric-warn .metric-value{color:var(--color-text-warning)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.invoice-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px}
+.invoice-row:last-child{border-bottom:none}
+.inv-id{color:var(--color-text-secondary);font-size:12px}
+.inv-amount{font-weight:500}
+.aging-bar{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.aging-seg{height:100%;transition:flex .3s}
+.aging-legend{display:flex;gap:12px;font-size:11px;color:var(--color-text-secondary)}
+.legend-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.action-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:13px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);transition:background .15s}
+.action-btn:hover{background:var(--color-background-secondary)}
+.action-btn.primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.action-btn.primary:hover{background:#0C447C;border-color:#0C447C}
+.action-btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.alert-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-warning);color:var(--color-text-warning);border:0.5px solid var(--color-border-warning)}
+.page{display:none;flex-direction:column;gap:16px}
+.page.active{display:flex}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 10px;text-align:left;font-size:11px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap}
+td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.pill-danger{background:var(--color-background-danger);color:var(--color-text-danger)}
+.pill-warn{background:var(--color-background-warning);color:var(--color-text-warning)}
+.pill-success{background:var(--color-background-success);color:var(--color-text-success)}
+.pill-info{background:var(--color-background-info);color:var(--color-text-info)}
+.flow-steps{display:flex;flex-direction:column;gap:0}
+.flow-step{display:flex;align-items:flex-start;gap:12px;padding:10px 0}
+.flow-step-num{width:28px;height:28px;min-width:28px;border-radius:50%;background:#185FA5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500}
+.flow-step-body{flex:1}
+.flow-step-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.flow-step-desc{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.flow-connector{width:28px;display:flex;justify-content:center;margin:-4px 0}
+.flow-connector i{font-size:14px;color:var(--color-text-tertiary)}
+.arch-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.arch-layer{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
+.arch-layer-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.arch-node{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:12px;margin-bottom:4px}
+.arch-node i{font-size:14px;color:var(--color-text-secondary)}
+.qr-box{width:120px;height:120px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;border:0.5px solid var(--color-border-tertiary)}
+.qr-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:12px}
+.qr-cell{height:10px;border-radius:1px}
+.section-tag{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.tab-row{display:flex;gap:4px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.tab{padding:8px 14px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:var(--color-text-primary);border-bottom-color:#185FA5;font-weight:500}
+</style>
+
+<h2 class="sr-only">KCC Debt Collection & Customer Self-Service Platform — interactive prototype showing dashboards for three user roles: Delivery & Billing Staff, Collection Officer, and Merchant/Customer</h2>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand"><i class="ti ti-building-bank" style="font-size:14px;margin-right:5px" aria-hidden="true"></i>KCC Platform</div>
+      <div class="sub">Digital Collection Suite</div>
+    </div>
+    <div class="role-switcher">
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">View as</div>
+      <select id="roleSelect" onchange="switchRole(this.value)">
+        <option value="merchant">Merchant / Customer</option>
+        <option value="delivery">Delivery & Billing Staff</option>
+        <option value="officer">Collection Officer</option>
+        <option value="arch">System Architecture</option>
+      </select>
+    </div>
+    <div id="nav"></div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="pageTitle">Merchant Dashboard</div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px" id="pageUser">Vientiane Mart Co. · #MC-00421</div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge badge-warn" id="roleTag">Merchant</span>
+        <i class="ti ti-bell" style="font-size:18px;color:var(--color-text-secondary);cursor:pointer" aria-label="Notifications"></i>
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--color-text-info)" id="userAvatar">VM</div>
+      </div>
+    </div>
+    <div class="content" id="mainContent"></div>
+  </div>
+</div>
+
+<script>
+const roles = {
+  merchant: {
+    tag: 'Merchant',
+    tagClass: 'badge-info',
+    user: 'Vientiane Mart Co. · #MC-00421',
+    avatar: 'VM',
+    nav: [
+      {icon:'ti-layout-dashboard',label:'Dashboard',page:'merchantDash'},
+      {icon:'ti-file-invoice',label:'My Invoices',page:'merchantInvoices'},
+      {icon:'ti-qrcode',label:'Pay Now',page:'merchantPay'},
+      {icon:'ti-history',label:'Payment History',page:'merchantHistory'},
+      {icon:'ti-download',label:'Download Statement',page:'merchantStatement'},
+    ]
+  },
+  delivery: {
+    tag: 'Delivery Staff',
+    tagClass: 'badge-success',
+    user: 'Phongsavanh K. · Region: Vientiane North',
+    avatar: 'PK',
+    nav: [
+      {icon:'ti-layout-dashboard',label:'Dashboard',page:'deliveryDash'},
+      {icon:'ti-truck',label:'Today\'s Deliveries',page:'deliveries'},
+      {icon:'ti-file-plus',label:'Create Invoice',page:'createInvoice'},
+      {icon:'ti-cash',label:'Collect Payment',page:'collectPayment'},
+      {icon:'ti-receipt',label:'Issue Receipt',page:'issueReceipt'},
+    ]
+  },
+  officer: {
+    tag: 'Collection Officer',
+    tagClass: 'badge-warn',
+    user: 'Khamla S. · Team: AR North',
+    avatar: 'KS',
+    nav: [
+      {icon:'ti-layout-dashboard',label:'Dashboard',page:'officerDash'},
+      {icon:'ti-alert-triangle',label:'Overdue Accounts',page:'overdueAccounts'},
+      {icon:'ti-chart-bar',label:'Aging Report',page:'agingReport'},
+      {icon:'ti-phone',label:'Collection Cases',page:'collectionCases'},
+      {icon:'ti-chart-line',label:'KPI Tracker',page:'kpiTracker'},
+    ]
+  },
+  arch: {
+    tag: 'Admin',
+    tagClass: 'badge-info',
+    user: 'System Administrator',
+    avatar: 'SA',
+    nav: [
+      {icon:'ti-sitemap',label:'Architecture',page:'archView'},
+      {icon:'ti-plug',label:'ERP Integration',page:'erpIntegration'},
+      {icon:'ti-shield-lock',label:'Security',page:'securityView'},
+      {icon:'ti-users',label:'User Management',page:'userMgmt'},
+    ]
+  }
+};
+
+const pages = {
+  merchantDash: () => `
+    <div class="metric-row">
+      <div class="metric metric-danger"><div class="metric-label">Outstanding balance</div><div class="metric-value">₭42.5M</div><div class="metric-sub">3 invoices unpaid</div></div>
+      <div class="metric metric-warn"><div class="metric-label">Due today</div><div class="metric-value">₭12.0M</div><div class="metric-sub">INV-2024-089</div></div>
+      <div class="metric metric-danger"><div class="metric-label">Overdue</div><div class="metric-value">₭8.5M</div><div class="metric-sub">15 days past due</div></div>
+      <div class="metric metric-success"><div class="metric-label">Available credit</div><div class="metric-value">₭50.0M</div><div class="metric-sub">Credit limit: ₭100M</div></div>
+    </div>
+    <div class="alert-row"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Invoice INV-2024-082 is 15 days overdue. Please settle to avoid service suspension.</div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Open invoices <span class="badge badge-warn">3 pending</span></div>
+        <div class="invoice-row"><div><div style="font-size:13px;font-weight:500">INV-2024-089</div><div class="inv-id">Due: 24 Jun 2026</div></div><div><div class="inv-amount">₭12.0M</div><span class="pill pill-warn">Due today</span></div></div>
+        <div class="invoice-row"><div><div style="font-size:13px;font-weight:500">INV-2024-085</div><div class="inv-id">Due: 20 Jun 2026</div></div><div><div class="inv-amount">₭22.0M</div><span class="pill pill-danger">Overdue</span></div></div>
+        <div class="invoice-row"><div><div style="font-size:13px;font-weight:500">INV-2024-082</div><div class="inv-id">Due: 09 Jun 2026</div></div><div><div class="inv-amount">₭8.5M</div><span class="pill pill-danger">15 days late</span></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Quick actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="action-btn primary" onclick="nav('merchantPay')"><i class="ti ti-qrcode" aria-hidden="true"></i> Pay now</button>
+          <button class="action-btn" onclick="nav('merchantInvoices')"><i class="ti ti-file-invoice" aria-hidden="true"></i> View all invoices</button>
+          <button class="action-btn" onclick="nav('merchantHistory')"><i class="ti ti-history" aria-hidden="true"></i> Payment history</button>
+          <button class="action-btn" onclick="nav('merchantStatement')"><i class="ti ti-download" aria-hidden="true"></i> Download statement</button>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary)">
+          <div class="card-title" style="margin-bottom:8px">Last payment</div>
+          <div style="font-size:13px;font-weight:500">₭18.0M</div>
+          <div style="font-size:12px;color:var(--color-text-secondary)">10 Jun 2026 · QR Payment</div>
+        </div>
+      </div>
+    </div>`,
+
+  merchantInvoices: () => `
+    <div class="tab-row">
+      <div class="tab active">All invoices</div>
+      <div class="tab">Open</div>
+      <div class="tab">Paid</div>
+      <div class="tab">Overdue</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Invoice list <span style="font-size:12px;color:var(--color-text-secondary);font-weight:400">Showing own invoices only</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Invoice #</th><th>Date</th><th>Due date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>INV-2024-089</td><td>10 Jun</td><td>24 Jun</td><td style="font-weight:500">₭12.0M</td><td><span class="pill pill-warn">Due today</span></td><td><button class="action-btn" style="padding:4px 10px;font-size:12px" onclick="nav('merchantPay')">Pay now</button></td></tr>
+            <tr><td>INV-2024-085</td><td>06 Jun</td><td>20 Jun</td><td style="font-weight:500">₭22.0M</td><td><span class="pill pill-danger">Overdue</span></td><td><button class="action-btn" style="padding:4px 10px;font-size:12px" onclick="nav('merchantPay')">Pay now</button></td></tr>
+            <tr><td>INV-2024-082</td><td>25 May</td><td>09 Jun</td><td style="font-weight:500">₭8.5M</td><td><span class="pill pill-danger">15 days late</span></td><td><button class="action-btn" style="padding:4px 10px;font-size:12px" onclick="nav('merchantPay')">Pay now</button></td></tr>
+            <tr><td>INV-2024-078</td><td>15 May</td><td>29 May</td><td style="font-weight:500">₭18.0M</td><td><span class="pill pill-success">Paid</span></td><td><button class="action-btn" style="padding:4px 10px;font-size:12px"><i class="ti ti-download" aria-hidden="true"></i> Receipt</button></td></tr>
+            <tr><td>INV-2024-071</td><td>01 May</td><td>15 May</td><td style="font-weight:500">₭11.5M</td><td><span class="pill pill-success">Paid</span></td><td><button class="action-btn" style="padding:4px 10px;font-size:12px"><i class="ti ti-download" aria-hidden="true"></i> Receipt</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`,
+
+  merchantPay: () => `
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Select invoices to pay</div>
+        <div class="invoice-row">
+          <div style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked style="width:15px;height:15px"><div><div style="font-size:13px;font-weight:500">INV-2024-089</div><div class="inv-id">Due today</div></div></div>
+          <div class="inv-amount">₭12.0M</div>
+        </div>
+        <div class="invoice-row">
+          <div style="display:flex;align-items:center;gap:10px"><input type="checkbox" style="width:15px;height:15px"><div><div style="font-size:13px;font-weight:500">INV-2024-085</div><div class="inv-id">Overdue</div></div></div>
+          <div class="inv-amount">₭22.0M</div>
+        </div>
+        <div class="invoice-row">
+          <div style="display:flex;align-items:center;gap:10px"><input type="checkbox" style="width:15px;height:15px"><div><div style="font-size:13px;font-weight:500">INV-2024-082</div><div class="inv-id">15 days late</div></div></div>
+          <div class="inv-amount">₭8.5M</div>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;color:var(--color-text-secondary)">Total selected</span>
+          <span style="font-size:18px;font-weight:500">₭12.0M</span>
+        </div>
+        <button class="action-btn primary" style="width:100%;justify-content:center;margin-top:10px"><i class="ti ti-qrcode" aria-hidden="true"></i> Generate QR code</button>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+        <div class="card-title" style="align-self:flex-start;width:100%">Dynamic QR — BCEL OnePay</div>
+        <div class="qr-box">
+          <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="5" y="5" width="25" height="25" rx="2" fill="none" stroke="currentColor" stroke-width="3"/>
+            <rect x="11" y="11" width="13" height="13" rx="1" fill="currentColor"/>
+            <rect x="60" y="5" width="25" height="25" rx="2" fill="none" stroke="currentColor" stroke-width="3"/>
+            <rect x="66" y="11" width="13" height="13" rx="1" fill="currentColor"/>
+            <rect x="5" y="60" width="25" height="25" rx="2" fill="none" stroke="currentColor" stroke-width="3"/>
+            <rect x="11" y="66" width="13" height="13" rx="1" fill="currentColor"/>
+            <rect x="40" y="5" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="48" y="5" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="40" y="13" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="40" y="40" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="50" y="40" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="60" y="40" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="70" y="40" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="80" y="40" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="60" y="50" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="70" y="50" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="60" y="60" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="80" y="60" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="60" y="70" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="70" y="80" width="5" height="5" rx="1" fill="currentColor"/>
+            <rect x="80" y="70" width="5" height="5" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:500">₭12,000,000</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:3px">Vientiane Mart Co. · INV-2024-089</div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:3px">QR valid for 15 minutes</div>
+        </div>
+        <div style="display:flex;gap:8px;width:100%">
+          <button class="action-btn" style="flex:1;justify-content:center;font-size:12px"><i class="ti ti-download" aria-hidden="true"></i> Save QR</button>
+          <button class="action-btn" style="flex:1;justify-content:center;font-size:12px"><i class="ti ti-share" aria-hidden="true"></i> Share</button>
+        </div>
+      </div>
+    </div>`,
+
+  merchantHistory: () => `
+    <div class="metric-row">
+      <div class="metric"><div class="metric-label">Total paid (2026)</div><div class="metric-value">₭89.5M</div></div>
+      <div class="metric metric-success"><div class="metric-label">On-time payments</div><div class="metric-value">94%</div></div>
+      <div class="metric"><div class="metric-label">Avg. payment days</div><div class="metric-value">8.2</div><div class="metric-sub">days after invoice</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Payment history</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Reference</th><th>Invoice</th><th>Method</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>10 Jun 2026</td><td>PAY-7821</td><td>INV-2024-078</td><td>QR / BCEL</td><td>₭18.0M</td><td><span class="pill pill-success">Confirmed</span></td></tr>
+            <tr><td>28 May 2026</td><td>PAY-7614</td><td>INV-2024-071</td><td>QR / BCEL</td><td>₭11.5M</td><td><span class="pill pill-success">Confirmed</span></td></tr>
+            <tr><td>14 May 2026</td><td>PAY-7410</td><td>INV-2024-065</td><td>Cash</td><td>₭22.0M</td><td><span class="pill pill-success">Confirmed</span></td></tr>
+            <tr><td>30 Apr 2026</td><td>PAY-7201</td><td>INV-2024-059</td><td>QR / BCEL</td><td>₭16.0M</td><td><span class="pill pill-success">Confirmed</span></td></tr>
+            <tr><td>15 Apr 2026</td><td>PAY-7089</td><td>INV-2024-051</td><td>Bank Transfer</td><td>₭22.0M</td><td><span class="pill pill-success">Confirmed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`,
+
+  merchantStatement: () => `
+    <div class="card">
+      <div class="card-title">Download account statement</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">From date</label><input type="date" value="2026-01-01" style="width:100%;font-size:13px"></div>
+        <div><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">To date</label><input type="date" value="2026-06-24" style="width:100%;font-size:13px"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="action-btn primary"><i class="ti ti-file-type-pdf" aria-hidden="true"></i> Download PDF</button>
+        <button class="action-btn"><i class="ti ti-table-export" aria-hidden="true"></i> Download Excel</button>
+      </div>
+    </div>`,
+
+  deliveryDash: () => `
+    <div class="metric-row">
+      <div class="metric"><div class="metric-label">Deliveries today</div><div class="metric-value">12</div><div class="metric-sub">6 completed</div></div>
+      <div class="metric metric-success"><div class="metric-label">Collected today</div><div class="metric-value">₭34.5M</div></div>
+      <div class="metric"><div class="metric-label">Invoices issued</div><div class="metric-value">8</div></div>
+      <div class="metric metric-warn"><div class="metric-label">Pending</div><div class="metric-value">6</div><div class="metric-sub">deliveries left</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Today's route — Vientiane North</div>
+        ${['Phonsavanh Shop','KMK Trading','Vientiane Mart Co.','Sunrise Market','Lao Garden Store','Phonethip Store'].map((c,i)=>`
+        <div class="invoice-row">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:22px;height:22px;border-radius:50%;background:${i<3?'var(--color-background-success)':'var(--color-background-secondary)'};display:flex;align-items:center;justify-content:center">
+              <i class="ti ${i<3?'ti-check':'ti-clock'}" style="font-size:12px;color:${i<3?'var(--color-text-success)':'var(--color-text-secondary)'}" aria-hidden="true"></i>
+            </div>
+            <span style="font-size:13px">${c}</span>
+          </div>
+          <span class="pill ${i<3?'pill-success':'pill-info'}">${i<3?'Done':'Pending'}</span>
+        </div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title">Quick actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="action-btn primary" onclick="nav('createInvoice')"><i class="ti ti-file-plus" aria-hidden="true"></i> Create invoice</button>
+          <button class="action-btn" onclick="nav('collectPayment')"><i class="ti ti-cash" aria-hidden="true"></i> Collect payment</button>
+          <button class="action-btn" onclick="nav('issueReceipt')"><i class="ti ti-receipt" aria-hidden="true"></i> Issue receipt</button>
+        </div>
+      </div>
+    </div>`,
+
+  createInvoice: () => `
+    <div class="card">
+      <div class="card-title">New invoice</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">Customer</label><select style="width:100%;font-size:13px"><option>Vientiane Mart Co.</option><option>Phonsavanh Shop</option><option>KMK Trading</option></select></div>
+        <div><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">Invoice date</label><input type="date" value="2026-06-24" style="width:100%;font-size:13px"></div>
+        <div><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">Due date</label><input type="date" value="2026-07-08" style="width:100%;font-size:13px"></div>
+        <div><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">Payment terms</label><select style="width:100%;font-size:13px"><option>Net 14</option><option>Net 30</option><option>COD</option></select></div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px">Line items</div>
+        <table style="width:100%">
+          <thead><tr><th>Product</th><th>Qty</th><th>Unit price</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td><input type="text" value="Gas cylinder 48kg" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 8px"></td><td><input type="number" value="5" style="width:60px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 8px"></td><td><input type="text" value="₭1,200,000" style="width:100px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 8px"></td><td style="font-weight:500">₭6,000,000</td></tr>
+          </tbody>
+        </table>
+        <button class="action-btn" style="margin-top:8px;font-size:12px"><i class="ti ti-plus" aria-hidden="true"></i> Add line</button>
+      </div>
+      <div style="margin-top:12px;text-align:right;font-size:15px;font-weight:500">Total: ₭6,000,000</div>
+      <div class="action-btn-row" style="margin-top:14px">
+        <button class="action-btn primary"><i class="ti ti-file-check" aria-hidden="true"></i> Save & send to ERP</button>
+        <button class="action-btn"><i class="ti ti-printer" aria-hidden="true"></i> Print</button>
+        <button class="action-btn"><i class="ti ti-qrcode" aria-hidden="true"></i> Generate QR</button>
+      </div>
+    </div>`,
+
+  collectPayment: () => `
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Select customer & invoice</div>
+        <div style="margin-bottom:12px"><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">Customer</label><select style="width:100%;font-size:13px"><option>Vientiane Mart Co.</option></select></div>
+        <div class="invoice-row"><div style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked><div><div style="font-size:13px;font-weight:500">INV-2024-089</div><div class="inv-id">₭12.0M · Due today</div></div></div><span class="pill pill-warn">Due</span></div>
+        <div class="invoice-row"><div style="display:flex;align-items:center;gap:10px"><input type="checkbox"><div><div style="font-size:13px;font-weight:500">INV-2024-085</div><div class="inv-id">₭22.0M · Overdue</div></div></div><span class="pill pill-danger">Overdue</span></div>
+        <div style="margin-top:12px;font-size:13px;font-weight:500;text-align:right">Collecting: ₭12.0M</div>
+        <div style="margin-top:10px"><label style="font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:5px">Payment method</label>
+          <select style="width:100%;font-size:13px"><option>QR / BCEL OnePay</option><option>Cash</option><option>Bank Transfer</option></select>
+        </div>
+        <button class="action-btn primary" style="width:100%;justify-content:center;margin-top:12px"><i class="ti ti-qrcode" aria-hidden="true"></i> Generate QR & collect</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Collection flow</div>
+        <div class="flow-steps">
+          ${[['Select invoices','Choose which invoices to collect'],['Generate QR','Create dynamic QR via payment gateway'],['Customer scans','Customer pays via mobile banking'],['Auto-matching','System matches payment to invoice'],['Issue receipt','Print or send digital receipt'],['ERP updated','Invoice marked paid in real time']].map((s,i)=>`
+          <div class="flow-step">
+            <div class="flow-step-num">${i+1}</div>
+            <div class="flow-step-body"><div class="flow-step-title">${s[0]}</div><div class="flow-step-desc">${s[1]}</div></div>
+          </div>${i<5?'<div class="flow-connector"><i class="ti ti-arrow-narrow-down" aria-hidden="true"></i></div>':''}`).join('')}
+        </div>
+      </div>
+    </div>`,
+
+  issueReceipt: () => `
+    <div class="card" style="max-width:420px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:500">KCC — Payment Receipt</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Receipt #REC-2026-04821</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;margin-bottom:14px">
+        <div class="invoice-row"><span style="color:var(--color-text-secondary);font-size:13px">Customer</span><span style="font-weight:500">Vientiane Mart Co.</span></div>
+        <div class="invoice-row"><span style="color:var(--color-text-secondary);font-size:13px">Invoice #</span><span>INV-2024-089</span></div>
+        <div class="invoice-row"><span style="color:var(--color-text-secondary);font-size:13px">Payment date</span><span>24 Jun 2026</span></div>
+        <div class="invoice-row"><span style="color:var(--color-text-secondary);font-size:13px">Method</span><span>QR / BCEL OnePay</span></div>
+        <div class="invoice-row" style="border-bottom:none"><span style="color:var(--color-text-secondary);font-size:13px">Collected by</span><span>Phongsavanh K.</span></div>
+      </div>
+      <div style="font-size:22px;font-weight:500;text-align:center;margin-bottom:4px">₭12,000,000</div>
+      <div style="text-align:center;margin-bottom:16px"><span class="pill pill-success">Payment confirmed</span></div>
+      <div class="action-btn-row" style="justify-content:center">
+        <button class="action-btn primary"><i class="ti ti-printer" aria-hidden="true"></i> Print</button>
+        <button class="action-btn"><i class="ti ti-mail" aria-hidden="true"></i> Email</button>
+        <button class="action-btn"><i class="ti ti-brand-whatsapp" aria-hidden="true"></i> WhatsApp</button>
+      </div>
+    </div>`,
+
+  officerDash: () => `
+    <div class="metric-row">
+      <div class="metric metric-danger"><div class="metric-label">Total overdue</div><div class="metric-value">₭187M</div><div class="metric-sub">23 accounts</div></div>
+      <div class="metric metric-warn"><div class="metric-label">Due this week</div><div class="metric-value">₭64M</div><div class="metric-sub">11 invoices</div></div>
+      <div class="metric metric-success"><div class="metric-label">Collected (June)</div><div class="metric-value">₭312M</div><div class="metric-sub">Target: ₭350M</div></div>
+      <div class="metric"><div class="metric-label">Collection rate</div><div class="metric-value">89%</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Aging overview</div>
+        <div style="margin-bottom:6px">
+          <div class="aging-bar">
+            <div class="aging-seg" style="flex:45;background:#185FA5"></div>
+            <div class="aging-seg" style="flex:25;background:#BA7517"></div>
+            <div class="aging-seg" style="flex:18;background:#E24B4A"></div>
+            <div class="aging-seg" style="flex:12;background:#A32D2D"></div>
+          </div>
+          <div class="aging-legend">
+            <span><span class="legend-dot" style="background:#185FA5"></span>0–30d (45%)</span>
+            <span><span class="legend-dot" style="background:#BA7517"></span>31–60d (25%)</span>
+            <span><span class="legend-dot" style="background:#E24B4A"></span>61–90d (18%)</span>
+            <span><span class="legend-dot" style="background:#A32D2D"></span>90d+ (12%)</span>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          ${[['0–30 days','₭84M','45%','pill-info'],['31–60 days','₭47M','25%','pill-warn'],['61–90 days','₭34M','18%','pill-danger'],['90+ days','₭22M','12%','pill-danger']].map(r=>`
+          <div class="invoice-row"><div><span style="font-size:13px">${r[0]}</span></div><div style="text-align:right"><span style="font-weight:500;margin-right:8px">${r[1]}</span><span class="pill ${r[3]}">${r[2]}</span></div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top overdue accounts</div>
+        ${[['Sunrise Market','₭34.5M','45 days'],['KMK Trading','₭28.0M','32 days'],['Phonethip Store','₭21.5M','28 days'],['Lao Garden','₭18.0M','22 days'],['Vang Vieng Co.','₭15.0M','18 days']].map(a=>`
+        <div class="invoice-row">
+          <div>
+            <div style="font-size:13px;font-weight:500">${a[0]}</div>
+            <div class="inv-id">${a[2]} overdue</div>
+          </div>
+          <div style="text-align:right">
+            <div class="inv-amount">${a[1]}</div>
+            <button class="action-btn" style="padding:3px 8px;font-size:11px;margin-top:3px"><i class="ti ti-phone" aria-hidden="true"></i> Follow up</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`,
+
+  agingReport: () => `
+    <div class="card">
+      <div class="card-title">Aging report — AR North team</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Customer</th><th>0–30d</th><th>31–60d</th><th>61–90d</th><th>90d+</th><th>Total</th><th>Risk</th></tr></thead>
+          <tbody>
+            ${[['Sunrise Market','₭0','₭0','₭18.5M','₭16.0M','₭34.5M','danger'],
+               ['KMK Trading','₭0','₭12.0M','₭16.0M','₭0','₭28.0M','warn'],
+               ['Phonethip Store','₭0','₭21.5M','₭0','₭0','₭21.5M','warn'],
+               ['Lao Garden','₭8.0M','₭10.0M','₭0','₭0','₭18.0M','info'],
+               ['Vientiane Mart','₭12.0M','₭22.0M','₭8.5M','₭0','₭42.5M','danger']].map(r=>`
+            <tr><td style="font-weight:500">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td style="font-weight:500">${r[5]}</td><td><span class="pill pill-${r[6]}">${r[6]==='danger'?'High':r[6]==='warn'?'Medium':'Low'}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`,
+
+  collectionCases: () => `
+    <div class="card">
+      <div class="card-title">Active collection cases <span class="badge badge-danger">8 open</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Case #</th><th>Customer</th><th>Amount</th><th>Days overdue</th><th>Last action</th><th>Next step</th><th></th></tr></thead>
+          <tbody>
+            ${[['CC-0041','Sunrise Market','₭34.5M','45','Phone call (15 Jun)','Letter notice','danger'],
+               ['CC-0039','KMK Trading','₭28.0M','32','Visit (18 Jun)','Payment plan','warn'],
+               ['CC-0038','Phonethip Store','₭21.5M','28','SMS (20 Jun)','Phone follow-up','warn'],
+               ['CC-0035','Lao Garden','₭18.0M','22','Invoice sent','Site visit','info']].map(r=>`
+            <tr>
+              <td style="font-size:12px;color:var(--color-text-secondary)">${r[0]}</td>
+              <td style="font-weight:500">${r[1]}</td>
+              <td>${r[2]}</td>
+              <td><span class="pill pill-${r[6]}">${r[3]}d</span></td>
+              <td style="font-size:12px;color:var(--color-text-secondary)">${r[4]}</td>
+              <td style="font-size:12px">${r[5]}</td>
+              <td><button class="action-btn" style="padding:3px 8px;font-size:11px"><i class="ti ti-edit" aria-hidden="true"></i> Update</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`,
+
+  kpiTracker: () => `
+    <div class="metric-row">
+      <div class="metric"><div class="metric-label">Collection rate</div><div class="metric-value">89%</div><div class="metric-sub">Target: 95%</div></div>
+      <div class="metric metric-success"><div class="metric-label">Cases closed</div><div class="metric-value">14</div><div class="metric-sub">This month</div></div>
+      <div class="metric"><div class="metric-label">Avg. days to collect</div><div class="metric-value">18.4</div></div>
+      <div class="metric metric-danger"><div class="metric-label">Escalated</div><div class="metric-value">3</div><div class="metric-sub">cases this month</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monthly collection vs target</div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="kpiChart" role="img" aria-label="Bar chart showing monthly collection performance vs target for Jan through Jun 2026">Monthly collection data for 2026.</canvas></div>
+    </div>
+    <script>
+      setTimeout(()=>{
+        if(window.Chart){
+          new Chart(document.getElementById('kpiChart'),{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Collected',data:[310,295,340,320,308,312],backgroundColor:'#185FA5'},{label:'Target',data:[350,350,350,350,350,350],type:'line',borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:2,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'M'}}}}});
+        }
+      },300);
+    <\/script>`,
+
+  archView: () => `
+    <div class="card">
+      <div class="card-title">Enterprise architecture — 5-layer design</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${[
+          ['Channel layer','ti-devices','#185FA5',['Mobile App','Web Portal','Collector App','Admin Portal']],
+          ['Business layer','ti-building','#0F6E56',['Customer Service','Invoice Service','Collection Service','Payment Service','Notification Service']],
+          ['Integration layer','ti-plug','#854F0B',['API Gateway','Batch Engine','DB Connector']],
+          ['Data layer','ti-database','#533AB7',['Customer DB','Invoice DB','Payment DB','Collection DB','Audit Log']],
+          ['Analytics layer','ti-chart-bar','#A32D2D',['Collection Dashboard','Aging Dashboard','KPI Tracker','Risk Score']],
+        ].map(l=>`
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <i class="ti ${l[1]}" style="font-size:16px;color:${l[2]}" aria-hidden="true"></i>
+            <span style="font-size:12px;font-weight:500;color:var(--color-text-primary)">${l[0]}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${l[3].map(n=>`<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 10px;font-size:12px">${n}</div>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`,
+
+  erpIntegration: () => `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      ${[
+        ['Option 1','API integration','ti-api','Recommended','#185FA5','badge-info','Real-time, secure, scalable. Connects to SAP, Oracle, Dynamics, Odoo via API Gateway.','pill-success'],
+        ['Option 2','Batch file sync','ti-file-export','Current ERP','#BA7517','badge-warn','CSV/XML/Excel file drops. Low cost, easy to implement, not real-time.','pill-warn'],
+        ['Option 3','Direct DB read','ti-database','Advanced','#A32D2D','badge-danger','Read-only replica access. Fast, no file transfer, but carries security and dependency risks.','pill-danger'],
+      ].map((o,i)=>`
+      <div class="card" style="${i===0?'border:2px solid var(--color-border-info)':''}">
+        ${i===0?'<div class="badge badge-info" style="margin-bottom:8px;display:inline-block">Recommended</div>':''}
+        <i class="ti ${o[2]}" style="font-size:22px;color:${o[4]};display:block;margin-bottom:8px" aria-hidden="true"></i>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">${o[1]}</div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:10px">${o[2]==='ti-api'?'SAP · Oracle · Odoo · Dynamics':'Existing ERP · Low effort'}</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">${o[5]}</div>
+      </div>`).join('')}
+    </div>`,
+
+  securityView: () => `
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Authentication</div>
+        <div class="flow-steps">
+          ${[['Username / password','Primary credential'],['OTP via SMS','Time-limited one-time code'],['MFA (optional)','Authenticator app support']].map((s,i)=>`
+          <div class="flow-step">
+            <div class="flow-step-num" style="background:#0F6E56">${i+1}</div>
+            <div class="flow-step-body"><div class="flow-step-title">${s[0]}</div><div class="flow-step-desc">${s[1]}</div></div>
+          </div>${i<2?'<div class="flow-connector"><i class="ti ti-arrow-narrow-down" aria-hidden="true"></i></div>':''}`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Authorization — RBAC</div>
+        ${[['Delivery Staff','View assigned customers, create invoices, collect payment','ti-truck','success'],
+           ['Collection Officer','View outstanding, follow-up, collection dashboard','ti-user-search','warn'],
+           ['Merchant','Own data only: invoices, payments, QR, statement','ti-building-store','info']].map(r=>`
+        <div class="invoice-row">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <i class="ti ${r[3]}" style="font-size:16px;color:var(--color-text-${r[3]==='ti-truck'?'success':r[3]==='ti-user-search'?'warning':'info'});margin-top:2px" aria-hidden="true"></i>
+            <div><div style="font-size:13px;font-weight:500">${r[0]}</div><div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">${r[1]}</div></div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Audit & data segregation</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+        ${['Login log','Payment log','Invoice view log','Change history','Merchant ID mapping','Data segregation'].map(a=>`
+        <div style="display:flex;align-items:center;gap:6px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;font-size:12px">
+          <i class="ti ti-check" style="font-size:14px;color:var(--color-text-success)" aria-hidden="true"></i>${a}</div>`).join('')}
+      </div>
+    </div>`,
+
+  userMgmt: () => `
+    <div class="card">
+      <div class="card-title">User management</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Role</th><th>Region</th><th>Last login</th><th>Status</th></tr></thead>
+          <tbody>
+            ${[['Phongsavanh K.','Delivery Staff','Vientiane North','24 Jun 2026','success'],
+               ['Khamla S.','Collection Officer','AR North','24 Jun 2026','success'],
+               ['Souksavanh B.','Delivery Staff','Vientiane South','23 Jun 2026','success'],
+               ['Manichan T.','Collection Officer','AR Central','22 Jun 2026','warn'],
+               ['Vientiane Mart','Merchant','–','24 Jun 2026','success']].map(u=>`
+            <tr>
+              <td style="font-weight:500">${u[0]}</td>
+              <td><span class="badge ${u[1]==='Merchant'?'badge-info':u[1]==='Delivery Staff'?'badge-success':'badge-warn'}">${u[1]}</span></td>
+              <td style="font-size:12px;color:var(--color-text-secondary)">${u[2]}</td>
+              <td style="font-size:12px;color:var(--color-text-secondary)">${u[3]}</td>
+              <td><span class="pill ${u[4]==='success'?'pill-success':'pill-warn'}">${u[4]==='success'?'Active':'Inactive'}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`,
+  overdueAccounts: () => pages.agingReport(),
+};
+
+function buildNav(role) {
+  const r = roles[role];
+  const nav = document.getElementById('nav');
+  nav.innerHTML = '<div class="nav-section">Navigation</div>' + r.nav.map((n,i)=>`<div class="nav-item${i===0?' active':''}" data-page="${n.page}" onclick="nav('${n.page}',this)"><i class="ti ${n.icon}" aria-hidden="true"></i>${n.label}</div>`).join('');
+}
+
+function nav(page, el) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else {
+    const found = document.querySelector(`[data-page="${page}"]`);
+    if(found){found.classList.add('active');}
+  }
+  const content = document.getElementById('mainContent');
+  const fn = pages[page];
+  content.innerHTML = fn ? fn() : '<div style="padding:20px;color:var(--color-text-secondary)">Page not found.</div>';
+  const titleMap = {};
+  const curRole = document.getElementById('roleSelect').value;
+  roles[curRole].nav.forEach(n=>{titleMap[n.page]=n.label;});
+  document.getElementById('pageTitle').textContent = titleMap[page]||page;
+  if(window.Chart && document.getElementById('kpiChart')) {
+    setTimeout(()=>{
+      new Chart(document.getElementById('kpiChart'),{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Collected (₭M)',data:[310,295,340,320,308,312],backgroundColor:'#185FA5'},{label:'Target',data:[350,350,350,350,350,350],type:'line',borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:2,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'M'}}}}});
+    },100);
+  }
+}
+
+function switchRole(role) {
+  const r = roles[role];
+  document.getElementById('roleTag').textContent = r.tag;
+  document.getElementById('roleTag').className = 'badge '+r.tagClass;
+  document.getElementById('pageUser').textContent = r.user;
+  document.getElementById('userAvatar').textContent = r.avatar;
+  buildNav(role);
+  const firstPage = roles[role].nav[0].page;
+  nav(firstPage, document.querySelector('.nav-item'));
+}
+
+buildNav('merchant');
+nav('merchantDash', document.querySelector('.nav-item'));
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
